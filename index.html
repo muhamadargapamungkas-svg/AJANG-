@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AJANG (Aksi Jaga Kebugaran)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f7;--card:#fff;--ink:#1b2a41;--mute:#66748a;--line:#dbe3ee;--acc:#2f6fed;--acc-ink:#fff;--gold:#f2b705;--up:#128a4b;--down:#c8362f;--hi:#f5f8ff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101722;--card:#18222f;--ink:#e8eef7;--mute:#93a1b5;--line:#2a3646;--acc:#6b9bff;--acc-ink:#0b1220;--up:#4cc58a;--down:#ff7a72;--hi:#1d2a3c}}
+:root[data-theme="dark"]{--bg:#101722;--card:#18222f;--ink:#e8eef7;--mute:#93a1b5;--line:#2a3646;--acc:#6b9bff;--acc-ink:#0b1220;--up:#4cc58a;--down:#ff7a72;--hi:#1d2a3c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:860px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;font-weight:800;margin:8px 0 2px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 16px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+input,button,select{font:inherit;color:inherit}
+input[type=search],select,.add input{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+input[type=search]{flex:1;min-width:160px}
+button{padding:9px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;font-weight:600}
+button.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+button.sm{padding:4px 10px;font-size:.85rem}
+button:hover{filter:brightness(.96)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.panel.hide{display:none}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;color:var(--mute);font-size:.9rem}
+.stats b{color:var(--ink)}
+.wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:480px}
+th{text-align:left;font-size:.85rem;color:var(--mute);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--hi)}
+td{padding:6px 12px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+td.rank{width:100px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.medal{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--gold);color:#1b2a41;font-size:.9rem}
+.delta{font-size:.78rem;font-weight:600;margin-left:6px}
+.delta.up{color:var(--up)}.delta.down{color:var(--down)}
+td input.nm{width:100%;padding:6px 8px;border:1px solid transparent;border-radius:6px;background:transparent}
+td input.nm:hover{border-color:var(--line)}
+td input.nm:focus{background:var(--card);border-color:var(--acc)}
+td.pt{width:80px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+td.ck,th.ck{width:36px}
+.meta{font-size:.78rem;color:var(--mute);padding:0 8px}
+.admin-only{display:none}
+body.admin .admin-only{display:table-cell}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:.88rem}
+.chip button{border:0;background:none;padding:0 6px;color:var(--mute)}
+.add{display:flex;gap:8px;flex-wrap:wrap}
+.add input{min-width:120px}
+.log{list-style:none;margin:8px 0 0;padding:0;font-size:.88rem;max-height:220px;overflow:auto}
+.log li{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid var(--line)}
+.pos{color:var(--up);font-weight:600}.neg{color:var(--down);font-weight:600}
+summary{cursor:pointer;font-weight:600}
+.note{color:var(--mute);font-size:.85rem;margin-top:12px}
+.empty{padding:24px;text-align:center;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div><h1>AJANG (Aksi Jaga Kebugaran)</h1></div>
+    <button id="mode">Mode admin: mati</button>
+  </div>
+
+  <div class="panel hide" id="admin">
+    <div class="bar" style="margin-bottom:0">
+      <select id="type" aria-label="Jenis poin"></select>
+      <button class="primary" id="give">Beri poin ke 0 pengurus terpilih</button>
+      <button id="all">Pilih semua</button>
+      <button id="none">Kosongkan pilihan</button>
+    </div>
+    <details style="margin-top:10px"><summary>Kelola jenis poin</summary>
+      <div class="chips" id="chips"></div>
+      <div class="add">
+        <input id="tl" placeholder="Nama poin, mis. Juara kelas" aria-label="Nama poin">
+        <input id="tp" type="number" step="1" placeholder="Nilai (boleh minus)" aria-label="Nilai poin" style="width:170px">
+        <button id="addt">Tambah jenis poin</button>
+      </div>
+    </details>
+    <details style="margin-top:10px"><summary>Riwayat poin</summary>
+      <ul class="log" id="log"></ul>
+    </details>
+  </div>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Cari nama, kelas, atau bidang" aria-label="Cari nama siswa">
+    <button id="sort">Urut: peringkat</button>
+    <button class="primary" id="apply">Terapkan peringkat</button>
+    <button id="reset" class="admin-only" style="display:none">Reset semua ke 0</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="wrap">
+    <table>
+      <thead><tr><th class="ck admin-only"></th><th>Peringkat</th><th>Nama pengurus</th><th style="text-align:right">Poin</th><th class="admin-only"></th></tr></thead>
+      <tbody id="body"></tbody>
+    </table>
+  </div>
+  
+</main>
+<script>
+var DATA=[["Lionita Joefana Rahmadini", "XI SIJA 2", "Ketua OSIS"],["Muhammad Hanif Attala", "XI TITL 1", "Wakil Ketua OSIS"],["Sophie Aulia Hana", "XI SIJA 2", "Sekretaris"], ["Syarrine Nasya Aprilia", "XI TME 3", "Sekretaris"], ["Regina Ata Wibowo", "XI KGS 1", "Bendahara"], ["Khabibi El Azzam Alkhafid", "XI SIJA 1", "Bendahara"], ["Muhammad Murtadho", "XI TEK 3", "Anggota Bidang 1 Keimanan & Ketakwaan"], ["Krista Wijaya", "XI TFLM 2", "Ketua Bidang 1 Keimanan & Ketakwaan"], ["Khoirus Sabiq Mujtaba", "XI TKR 1", "Anggota Bidang 1 Keimanan & Ketakwaan"], ["Tsabita Zahra Saparudin", "XI TEK 2", "Anggota Bidang 2 Budi Pekerti Luhur & Akhlak Mulia"], ["Nisriina Salwaa Anjani", "XI TITL 1", "Anggota Bidang 2 Budi Pekerti Luhur & Akhlak Mulia"], ["Dewwie Sekar Melaty", "XI KGS 1", "Ketua Bidang 2 Budi Pekerti Luhur & Akhlak Mulia"], ["Keisha Calya Sakhi", "XI SIJA 2", "Anggota Bidang 2 Budi Pekerti Luhur & Akhlak Mulia"], ["Syafiq Mirza Khoizuran", "XI TITL 2", "Ketua Bidang 3 Wawasan Kebangsaan & Bela Negara"], ["Ridho Akhtar Hartanto", "XI TKR 1", "Anggota Bidang 3 Wawasan Kebangsaan & Bela Negara"], ["Muhammad Daffa Putra Phoenna", "XI SIJA 3", "Anggota Bidang 3 Wawasan Kebangsaan & Bela Negara"], ["Nawaksara Parama Arta", "XI TME 3", "Ketua Bidang 4 Prestasi Akademik, Seni & Olahraga"], ["Muhamad Arga Pamungkas", "XI TKR 2", "Anggota Bidang 4 Prestasi Akademik, Seni & Olahraga"], ["Fahish Vinza Pratama", "XI TFLM 1", "Anggota Bidang 4 Prestasi Akademik, Seni & Olahraga"], ["Valine Angelica", "XI SIJA 1", "Anggota Bidang 5 Demokrasi, HAM & Lingkungan"], ["Allissa Keyza Pramesthi", "XI TME 1", "Ketua Bidang 5 Demokrasi, HAM & Lingkungan"], ["Muhamad Dava Ardiantara", "XI TKR 3", "Anggota Bidang 5 Demokrasi, HAM & Lingkungan"], ["Luthfiyyatun Nur Layla Ramadhani", "XI TEK 2", "Ketua Bidang 6 Kreativitas & Kewirausahaan"], ["Kenzo Aditya Pratama", "XI SIJA 1", "Anggota Bidang 6 Kreativitas & Kewirausahaan"], ["Bagus Arthawijaya", "XI TKR 1", "Anggota Bidang 6 Kreativitas & Kewirausahaan"], ["Nailah Rafifah Khairunnisa", "XI SIJA 3", "Anggota Bidang 7 Jasmani, Kesehatan & Gizi"], ["Ammar Putra Bimantara", "XI SIJA 2", "Ketua Bidang 7 Jasmani, Kesehatan & Gizi"], ["Muhammad Fadhill Abdur Rahman", "XI TME 1", "Anggota Bidang 7 Jasmani, Kesehatan & Gizi"], ["Annisa Putri Santosa", "XI KGS 1", "Ketua Bidang 8 Sastra & Budaya"], ["Risma Ayu Rahmawati", "XI TFLM 2", "Anggota Bidang 8 Sastra & Budaya"], ["Muhammad Raffi Syahrijal Radin", "XI SIJA 3", "Anggota Bidang 8 Sastra & Budaya"], ["Rizqya Jaya Utama", "XI SIJA 3", "Anggota Bidang 9 Teknologi, Informasi & Komunikasi"], ["Laurentius Wisnu Ardianto Putra Omega", "XI SIJA 2", "Ketua Bidang 9 Teknologi, Informasi & Komunikasi"], ["Sebastien Farras Putra Setiawan", "XI TME 2", "Anggota Bidang 9 Teknologi, Informasi & Komunikasi"], ["Keannovan Adelio Kanadifa", "XI SIJA 1", "Anggota Bidang 10 Komunikasi Bahasa Asing"], ["Almirah Fahdiana", "XI TEK 3", "Anggota Bidang 10 Komunikasi Bahasa Asing"], ["Risma Avrillya Ayudea", "XI TITL 2", "Ketua Bidang 10 Komunikasi Bahasa Asing"]];
+var KEY="peringkat-siswa-v3",S=[],T=[],LOG=[],BASE={},byRank=true,query="",admin=false,sel={},nid=1;
+function defaults(){T=[{id:1,label:"Menyelesaikan misi (keaktifan)",pts:10}];nid=2}
+function seed(){S=DATA.map(function(d,i){return{id:i+1,name:d[0],cls:d[1],role:d[2],score:0}});LOG=[];BASE=ranks()}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY)||"null");if(d&&d.S&&d.S.length>0){S=d.S;var mx=Math.max.apply(null,S.map(function(s){return s.id}));DATA.slice().reverse().forEach(function(x){if(!S.some(function(s){return s.name===x[0]}))S.unshift({id:++mx,name:x[0],cls:x[1],role:x[2],score:0})});T=d.T;LOG=d.LOG||[];BASE=d.BASE||ranks();nid=d.nid||100;return}}catch(e){}seed();defaults()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({S:S,T:T,LOG:LOG,BASE:BASE,nid:nid}))}catch(e){}}
+function ranks(){var s=S.slice().sort(function(a,b){return b.score-a.score}),r={},last=null,pos=0;s.forEach(function(x,i){if(x.score!==last){pos=i+1;last=x.score}r[x.id]=pos});return r}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function sid(id){return S.filter(function(x){return x.id===id})[0]}
+function sign(n){return(n>0?"+":"")+n}
+function selCount(){return Object.keys(sel).filter(function(k){return sel[k]}).length}
+function give(ids,t){
+  ids.forEach(function(id){var s=sid(id);if(!s)return;s.score+=t.pts;LOG.unshift({id:nid++,sid:id,label:t.label,pts:t.pts,at:new Date().toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})})});
+  LOG=LOG.slice(0,200);save();render()
+}
+function render(){
+  var r=ranks(),list=S.slice();
+  if(byRank)list.sort(function(a,b){return r[a.id]-r[b.id]||a.id-b.id});
+  var q=query.trim().toLowerCase();
+  if(q)list=list.filter(function(s){return (s.name+" "+s.cls+" "+s.role).toLowerCase().indexOf(q)>-1});
+  document.getElementById("body").innerHTML=list.map(function(s){
+    var rk=r[s.id],d=(BASE[s.id]||rk)-rk,dl="";
+    if(d>0)dl='<span class="delta up">▲ '+d+'</span>';else if(d<0)dl='<span class="delta down">▼ '+(-d)+'</span>';
+    var rkh=(rk<=3&&s.score>0)?'<span class="medal">'+rk+'</span>':rk;
+    return '<tr><td class="ck admin-only"><input type="checkbox" data-sel="'+s.id+'" '+(sel[s.id]?"checked":"")+' aria-label="Pilih '+esc(s.name)+'"></td><td class="rank">'+rkh+dl+'</td><td><input class="nm" data-id="'+s.id+'" value="'+esc(s.name)+'" aria-label="Nama siswa" '+(admin?"":"readonly")+'><div class="meta">'+esc(s.cls)+', '+esc(s.role)+'</div></td><td class="pt">'+s.score+'</td><td class="admin-only"><button class="sm" data-one="'+s.id+'">+ Beri</button></td></tr>';
+  }).join("")||'<tr><td colspan="5" class="empty">Tidak ada siswa dengan nama itu.</td></tr>';
+  var sc=S.map(function(s){return s.score}),avg=sc.reduce(function(a,b){return a+b},0)/sc.length;
+  document.getElementById("stats").innerHTML='<span><b>'+S.length+'</b> pengurus</span><span>Rata-rata <b>'+avg.toFixed(1)+'</b></span><span>Tertinggi <b>'+Math.max.apply(null,sc)+'</b></span><span>Terendah <b>'+Math.min.apply(null,sc)+'</b></span>';
+  var ts=document.getElementById("type"),cur=ts.value;
+  ts.innerHTML=T.map(function(t){return '<option value="'+t.id+'">'+esc(t.label)+' ('+sign(t.pts)+')</option>'}).join("");
+  if(cur)ts.value=cur;
+  document.getElementById("chips").innerHTML=T.map(function(t){return '<span class="chip">'+esc(t.label)+' '+sign(t.pts)+'<button data-delt="'+t.id+'" aria-label="Hapus '+esc(t.label)+'">✕</button></span>'}).join("")||'<span class="sub">Belum ada jenis poin. Tambahkan di bawah.</span>';
+  document.getElementById("give").textContent="Beri poin ke "+selCount()+" pengurus terpilih";
+  document.getElementById("log").innerHTML=LOG.map(function(l){var s=sid(l.sid);return '<li><span>'+esc(s?s.name:"?")+' · '+esc(l.label)+' <span class="'+(l.pts>=0?"pos":"neg")+'">'+sign(l.pts)+'</span> <span style="color:var(--mute)">'+l.at+'</span></span><button class="sm" data-undo="'+l.id+'">Batalkan</button></li>'}).join("")||'<li><span style="color:var(--mute)">Belum ada poin yang diberikan.</span></li>';
+}
+function curType(){var id=+document.getElementById("type").value;return T.filter(function(t){return t.id===id})[0]}
+document.addEventListener("click",function(e){
+  var t=e.target,a;
+  if(a=t.dataset.one){var ty=curType();if(!ty)return alert("Tambahkan jenis poin dulu.");give([+a],ty)}
+  else if(a=t.dataset.delt){T=T.filter(function(x){return x.id!==+a});save();render()}
+  else if(a=t.dataset.undo){var i=LOG.findIndex(function(l){return l.id===+a});if(i>-1){var l=LOG[i],s=sid(l.sid);if(s)s.score-=l.pts;LOG.splice(i,1);save();render()}}
+});
+document.getElementById("body").addEventListener("change",function(e){
+  var t=e.target;
+  if(t.dataset.sel){sel[t.dataset.sel]=t.checked;render()}
+  else if(t.classList.contains("nm")){var s=sid(+t.dataset.id);s.name=t.value.trim()||s.name;save();render()}
+});
+document.getElementById("give").onclick=function(){var ty=curType(),ids=Object.keys(sel).filter(function(k){return sel[k]}).map(Number);if(!ty)return alert("Tambahkan jenis poin dulu.");if(!ids.length)return alert("Pilih siswa dulu dengan kotak centang.");sel={};give(ids,ty)};
+document.getElementById("all").onclick=function(){S.forEach(function(s){sel[s.id]=true});render()};
+document.getElementById("none").onclick=function(){sel={};render()};
+document.getElementById("addt").onclick=function(){var l=document.getElementById("tl").value.trim(),p=parseInt(document.getElementById("tp").value,10);if(!l||isNaN(p))return alert("Isi nama poin dan nilainya.");T.push({id:nid++,label:l,pts:p});document.getElementById("tl").value="";document.getElementById("tp").value="";save();render()};
+document.getElementById("q").oninput=function(e){query=e.target.value;render()};
+document.getElementById("sort").onclick=function(e){byRank=!byRank;e.target.textContent=byRank?"Urut: peringkat":"Urut: daftar awal";render()};
+document.getElementById("apply").onclick=function(){BASE=ranks();save();render()};
+document.getElementById("reset").onclick=function(){if(confirm("Reset semua poin ke 0 dan hapus riwayat?")){S.forEach(function(s){s.score=0});LOG=[];sel={};BASE=ranks();save();render()}};
+document.getElementById("mode").onclick=function(e){admin=!admin;document.body.classList.toggle("admin",admin);document.getElementById("admin").classList.toggle("hide",!admin);document.getElementById("reset").style.display=admin?"":"none";e.target.textContent="Mode admin: "+(admin?"aktif":"mati");render()};
+load();render();
+</script>
+</body>
+</html>
